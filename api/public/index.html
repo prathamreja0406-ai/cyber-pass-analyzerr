@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Cyber Pass Analyzer</title>
+
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+    <main class="container">
+
+        <p class="tag">CYBERSECURITY • PYTHON PROJECT</p>
+
+        <h1>Cyber Pass<br>Analyzer<span>.</span></h1>
+
+        <p class="subtitle">
+            Analyze the basic strength of a password
+            using simple security checks.
+        </p>
+
+        <div class="analyzer">
+
+            <label for="password">PASSWORD</label>
+
+            <div class="input-box">
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Enter a test password"
+                >
+
+                <button onclick="togglePassword()" class="eye">
+                    Show
+                </button>
+            </div>
+
+            <button onclick="analyzePassword()" class="analyze-btn">
+                Analyze Password →
+            </button>
+
+        </div>
+
+
+        <section id="result" class="result hidden">
+
+            <div class="result-top">
+                <div>
+                    <p class="small-title">PASSWORD STRENGTH</p>
+                    <h2 id="strength">—</h2>
+                </div>
+
+                <div class="score">
+                    <span id="score">0</span>/5
+                </div>
+            </div>
+
+
+            <div class="checks">
+
+                <div class="check">
+                    <span>Length</span>
+                    <b id="lengthCheck">—</b>
+                </div>
+
+                <div class="check">
+                    <span>Uppercase</span>
+                    <b id="upperCheck">—</b>
+                </div>
+
+                <div class="check">
+                    <span>Lowercase</span>
+                    <b id="lowerCheck">—</b>
+                </div>
+
+                <div class="check">
+                    <span>Number</span>
+                    <b id="digitCheck">—</b>
+                </div>
+
+                <div class="check">
+                    <span>Special character</span>
+                    <b id="specialCheck">—</b>
+                </div>
+
+            </div>
+
+
+            <div class="suggestions">
+
+                <p class="small-title">IMPROVEMENT SUGGESTIONS</p>
+
+                <ul id="suggestions"></ul>
+
+            </div>
+
+        </section>
+
+
+        <footer>
+            Built with Python • Cyber Pass Analyzer
+        </footer>
+
+    </main>
+
+
+    <script>
+
+        function togglePassword() {
+
+            const input = document.getElementById("password");
+            const button = document.querySelector(".eye");
+
+            if (input.type === "password") {
+                input.type = "text";
+                button.innerText = "Hide";
+            } else {
+                input.type = "password";
+                button.innerText = "Show";
+            }
+        }
+
+
+        async function analyzePassword() {
+
+            const password =
+                document.getElementById("password").value;
+
+            if (!password) {
+                alert("Please enter a password.");
+                return;
+            }
+
+            const response = await fetch("/api", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    password: password
+                })
+
+            });
+
+            const data = await response.json();
+
+            document.getElementById("result")
+                .classList.remove("hidden");
+
+            document.getElementById("strength")
+                .innerText = data.strength;
+
+            document.getElementById("score")
+                .innerText = data.score;
+
+
+            document.getElementById("lengthCheck")
+                .innerText =
+                data.length >= 8 ? "✓" : "✗";
+
+            document.getElementById("upperCheck")
+                .innerText =
+                data.uppercase ? "✓" : "✗";
+
+            document.getElementById("lowerCheck")
+                .innerText =
+                data.lowercase ? "✓" : "✗";
+
+            document.getElementById("digitCheck")
+                .innerText =
+                data.digit ? "✓" : "✗";
+
+            document.getElementById("specialCheck")
+                .innerText =
+                data.special ? "✓" : "✗";
+
+
+            const list =
+                document.getElementById("suggestions");
+
+            list.innerHTML = "";
+
+            data.suggestions.forEach(function(item) {
+
+                const li = document.createElement("li");
+
+                li.innerText = item;
+
+                list.appendChild(li);
+
+            });
+
+        }
+
+    </script>
+
+</body>
+</html>
